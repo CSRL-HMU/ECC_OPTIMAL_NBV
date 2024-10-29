@@ -250,7 +250,7 @@ for exper in range(1, 10):
     bounds =[[1e-3, 1e-3, 0, 0], [1.0, 3.0, np.pi / 2, 2 * np.pi]]
 
     # Run CMA-ES
-    es = cma.CMAEvolutionStrategy(initial_parameters, sigma, {'bounds': bounds, 'maxiter': 250})
+    es = cma.CMAEvolutionStrategy(initial_parameters, sigma, {'bounds': bounds, 'maxiter': 4})
 
     # Lists to store covariance metrics
 
@@ -548,77 +548,95 @@ ax.set_title('Camera Motion Animation with Moving Target on Hemispherical Dome')
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
-ax.grid(True)
+ax.grid(True,linestyle='--', alpha=0.5)
 ax.set_box_aspect([1,1,1])  # For axis equal
 
 
 
 # Create subplots: 3x2 layout
-fig, axs = plt.subplots(3, 2, figsize=(12, 15))
+fig, axs = plt.subplots(4, 1, figsize=(8, 6))
 
 # First subplot: Pendulum X Position
-axs[0, 0].plot(trajectory[:, 0], 'k', label=r'Ground Truth')
-axs[0, 0].plot(measurements_before[:, 0], 'b--', label=r'Measurements Before')
-axs[0, 0].plot(initial_estimations[:, 0], 'b', label=r'UKF Before')
-axs[0, 0].plot(measurements_after[:, 0], 'r--', label=r'Measurements After')
-axs[0, 0].plot(final_estimations[:, 0], 'r', label=r'UKF After')
-axs[0, 0].grid(True)
-axs[0, 0].set_title(r'Pendulum - X Position', fontsize=12)
-axs[0, 0].set_xlabel(r'Samples', fontsize=10)
-axs[0, 0].set_ylabel(r'X Position (m)', fontsize=10)
-axs[0, 0].legend()
+axs[0].plot(trajectory[:, 0], 'k', label=r'Ground Truth', linewidth=1)
+axs[0].plot(measurements_before[:, 0], 'b--', label=r'Measurements Before', linewidth=1)
+axs[0].plot(initial_estimations[:, 0], 'b', label=r'UKF Before', linewidth=1)
+axs[0].plot(measurements_after[:, 0], 'r--', label=r'Measurements After', linewidth=1)
+axs[0].plot(final_estimations[:, 0], 'r', label=r'UKF After', linewidth=1)
+axs[0].grid(True,linestyle='--', alpha=0.5)
+#axs[0].set_title(r'Pendulum - X Position', fontsize=12)
+#axs[0].set_xlabel(r'Samples', fontsize=10)
+axs[0].set_ylabel(r'X Pos(m)', fontsize=8)
+axs[0].legend(loc='upper center', bbox_to_anchor=(0.5, 1.3), ncol=3, fontsize=8)
+
+
 
 # Second subplot: Pendulum Y Position
-axs[1, 0].plot(trajectory[:, 1], 'k', label=r'Ground Truth')
-axs[1, 0].plot(measurements_before[:, 1], 'b--', label=r'Measurements Before')
-axs[1, 0].plot(initial_estimations[:, 1], 'b', label=r'UKF Before')
-axs[1, 0].plot(measurements_after[:, 1], 'r--', label=r'Measurements After')
-axs[1, 0].plot(final_estimations[:, 1], 'r', label=r'UKF After')
-axs[1, 0].grid(True)
-axs[1, 0].set_title(r'Pendulum - Y Position', fontsize=12)
-axs[1, 0].set_xlabel(r'Samples', fontsize=10)
-axs[1, 0].set_ylabel(r'Y Position (m)', fontsize=10)
-axs[1, 0].legend()
+axs[1].plot(trajectory[:, 1], 'k', label=r'Ground Truth', linewidth=1)
+axs[1].plot(measurements_before[:, 1], 'b--', label=r'Measurements Before', linewidth=1)
+axs[1].plot(initial_estimations[:, 1], 'b', label=r'UKF Before', linewidth=1)
+axs[1].plot(measurements_after[:, 1], 'r--', label=r'Measurements After', linewidth=1)
+axs[1].plot(final_estimations[:, 1], 'r', label=r'UKF After', linewidth=1)
+axs[1].grid(True,linestyle='--', alpha=0.5)
+#axs[1].set_title(r'Pendulum - Y Position', fontsize=12)
+#axs[1].set_xlabel(r'Samples', fontsize=10)
+axs[1].set_ylabel(r'Y Pos(m)', fontsize=8)
+# axs[1].legend()
 
 # Third subplot: Pendulum Z Position
-axs[2, 0].plot(trajectory[:, 2], 'k', label=r'Ground Truth')
-axs[2, 0].plot(measurements_before[:, 2], 'b--', label=r'Measurements Before')
-axs[2, 0].plot(initial_estimations[:, 2], 'b', label=r'UKF Before')
-axs[2, 0].plot(measurements_after[:, 2], 'r--', label=r'Measurements After')
-axs[2, 0].plot(final_estimations[:, 2], 'r', label=r'UKF After')
-axs[2, 0].grid(True)
-axs[2, 0].set_title(r'Pendulum - Z Position', fontsize=12)
-axs[2, 0].set_xlabel(r'Samples', fontsize=10)
-axs[2, 0].set_ylabel(r'Z Position (m)', fontsize=10)
-axs[2, 0].legend()
+axs[2].plot(trajectory[:, 2], 'k', label=r'Ground Truth', linewidth=1)
+axs[2].plot(measurements_before[:, 2], 'b--', label=r'Measurements Before', linewidth=1)
+axs[2].plot(initial_estimations[:, 2], 'b', label=r'UKF Before', linewidth=1)
+axs[2].plot(measurements_after[:, 2], 'r--', label=r'Measurements After', linewidth=1)
+axs[2].plot(final_estimations[:, 2], 'r', label=r'UKF After', linewidth=1)
+axs[2].grid(True,linestyle='--', alpha=0.5)
+#axs[2].set_title(r'Pendulum - Z Position', fontsize=12)
+#axs[2].set_xlabel(r'Samples', fontsize=10)
+axs[2].set_ylabel(r'Z Pos(m)', fontsize=8)
+# axs[2].legend()
 
-# Fourth subplot: Error in X
-axs[0, 1].plot(trajectory[:, 0] - final_estimations[:, 0], 'r', label=r'$X_{Ground\_Tr} - X_{After\_Optim}$')
-axs[0, 1].plot(trajectory[:, 0] - initial_estimations[:, 0], 'b', label=r'$X_{Ground\_Tr} - X_{Before\_Optim}$')
-axs[0, 1].grid(True)
-axs[0, 1].set_title(r'Error in X', fontsize=12)
-axs[0, 1].legend()
+# # Fourth subplot: Error in X
+# axs[0, 1].plot(trajectory[:, 0] - final_estimations[:, 0], 'r', label=r'$X_{Ground\_Tr} - X_{After\_Optim}$')
+# axs[0, 1].plot(trajectory[:, 0] - initial_estimations[:, 0], 'b', label=r'$X_{Ground\_Tr} - X_{Before\_Optim}$')
+# axs[0, 1].grid(True)
+# axs[0, 1].set_title(r'Error in X', fontsize=12)
+# axs[0, 1].legend()
 
-# Fifth subplot: Error in Y
-axs[1, 1].plot(trajectory[:, 1] - final_estimations[:, 1], 'r', label=r'$Y_{Ground\_Tr} - Y_{After\_Optim}$')
-axs[1, 1].plot(trajectory[:, 1] - initial_estimations[:, 1], 'b', label=r'$Y_{Ground\_Tr} - Y_{Before\_Optim}$')
-axs[1, 1].grid(True)
-axs[1, 1].set_title(r'Error in Y', fontsize=12)
-axs[1, 1].legend()
+# # Fifth subplot: Error in Y
+# axs[1, 1].plot(trajectory[:, 1] - final_estimations[:, 1], 'r', label=r'$Y_{Ground\_Tr} - Y_{After\_Optim}$')
+# axs[1, 1].plot(trajectory[:, 1] - initial_estimations[:, 1], 'b', label=r'$Y_{Ground\_Tr} - Y_{Before\_Optim}$')
+# axs[1, 1].grid(True)
+# axs[1, 1].set_title(r'Error in Y', fontsize=12)
+# axs[1, 1].legend()
 
-# Sixth subplot: Error in Z
-axs[2, 1].plot(trajectory[:, 2] - final_estimations[:, 2], 'r', label=r'$Z_{Ground\_Tr} - Z_{After\_Optim}$')
-axs[2, 1].plot(trajectory[:, 2] - initial_estimations[:, 2], 'b', label=r'$Z_{Ground\_Tr} - Z_{Before\_Optim}$')
-axs[2, 1].grid(True)
-axs[2, 1].set_title(r'Error in Z', fontsize=12)
-axs[2, 1].legend()
+# # Sixth subplot: Error in Z
+# axs[2, 1].plot(trajectory[:, 2] - final_estimations[:, 2], 'r', label=r'$Z_{Ground\_Tr} - Z_{After\_Optim}$')
+# axs[2, 1].plot(trajectory[:, 2] - initial_estimations[:, 2], 'b', label=r'$Z_{Ground\_Tr} - Z_{Before\_Optim}$')
+# axs[2, 1].grid(True)
+# axs[2, 1].set_title(r'Error in Z', fontsize=12)
+# axs[2, 1].legend()
 
+# Calculate cumulative errors for final and initial estimations
+final_error = np.sqrt((trajectory[:, 0] - final_estimations[:, 0])**2 +
+                      (trajectory[:, 1] - final_estimations[:, 1])**2 +
+                      (trajectory[:, 2] - final_estimations[:, 2])**2)
+
+initial_error = np.sqrt((trajectory[:, 0] - initial_estimations[:, 0])**2 +
+                        (trajectory[:, 1] - initial_estimations[:, 1])**2 +
+                        (trajectory[:, 2] - initial_estimations[:, 2])**2)
+
+
+
+axs[3].plot(final_error, 'r', label=r'Optimal Params', linewidth=1)
+axs[3].plot(initial_error, 'b', label=r'Arbitrary Params', linewidth=1)
+axs[3].grid(True,linestyle='--', alpha=0.5)
+axs[3].set_xlabel('Samples')
+axs[3].set_ylabel(r'$\|Error\|_2$')
+axs[3].legend(ncol=2)
 # Adjust layout to prevent overlap
 plt.tight_layout()
 
 # Show the plot
 plt.show()
-
 
 
 
@@ -694,8 +712,8 @@ for exper in range(1, 10):
     #------------------------------------------------------------------------------------------
 
     ax.plot(trajectory[:, 0], trajectory[:, 1], trajectory[:, 2],'k', label='Ground Truth' if exper == 1 else "")
-    ax.plot(final_estimations[:, 0],final_estimations[:, 1],final_estimations[:, 2],'c', label='UKF_AFTER'if exper == 1 else "")
-    ax.plot(initial_estimations[:, 0],initial_estimations[:, 1],initial_estimations[:, 2],'m', label='UKF_BEFORE'if exper == 1 else "")
+    # ax.plot(final_estimations[:, 0],final_estimations[:, 1],final_estimations[:, 2],'c', label='UKF_AFTER'if exper == 1 else "")
+    # ax.plot(initial_estimations[:, 0],initial_estimations[:, 1],initial_estimations[:, 2],'m', label='UKF_BEFORE'if exper == 1 else "")
 
 
     ############################------------BEFORE-------------------------------
