@@ -1,0 +1,44 @@
+% Parameters
+r = 2;             % Radius of the hemisphere
+offset = -1;       % Offset for the dome center along the x-axis
+n_points = 100;    % Number of points for the trajectory
+
+% Create mesh grid for the hemispherical dome (theta, phi)
+theta = linspace(0, 2*pi, 50);    % Azimuth angle
+phi = linspace(0, pi/2, 25);      % Elevation angle (upper half only)
+[Theta, Phi] = meshgrid(theta, phi);
+
+% Parametric equations for the hemisphere in Cartesian coordinates
+X_dome = r * cos(Phi) + offset;
+Y_dome = r * sin(Phi) .* cos(Theta);
+Z_dome = r * sin(Phi) .* sin(Theta);
+
+% Create a cosine trajectory along the y-axis within the hemisphere
+z_traj = linspace(0, r, n_points);            % Z-axis values for the trajectory
+rho_traj = sqrt(r^2 - z_traj.^2);             % Radius at each height level to stay within the dome
+y_traj = 0.3*(rho_traj .* cos(-pi * z_traj / r));  % Cosine wave along the y-axis
+x_traj = 0.3*(offset + sqrt(rho_traj.^2 - y_traj.^2)); % X component to stay within radius
+
+
+% Plot the hemispherical dome
+figure;
+hold on;
+surf(X_dome, Y_dome, Z_dome, 'FaceColor', [0.8, 0.5, 0.5], 'EdgeColor', 'none', 'FaceAlpha', 0.5);
+
+% Plot the cosine trajectory inside the dome
+plot3(x_traj, y_traj, z_traj, 'b', 'LineWidth', 2, 'DisplayName', 'Cosine Trajectory');
+
+% Additional plot settings
+xlabel('X');
+ylabel('Y');
+zlabel('Z');
+title('Cosine Trajectory Inside Hemispherical Dome');
+axis equal;
+xlim([-r-1, r+1]);
+ylim([-r-1, r+1]);
+zlim([0, r]);
+
+% Show legend and grid
+legend('show');
+grid on;
+hold off;
