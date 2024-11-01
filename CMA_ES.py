@@ -230,8 +230,8 @@ def objective_function(params):
         print(f"Exception in objective function: {e}")
         return np.inf
 
-experiments = np.zeros([100,4])
-initial_params = np.zeros([100,4])
+experiments = np.zeros([50,4])
+initial_params = np.zeros([50,4])
 
 # Define ranges for phi and theta (you can adjust these ranges based on your needs)
 phi_range = np.linspace(np.pi / 5, np.pi / 3, 2)   # 10 values between 0 and pi for phi
