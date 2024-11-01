@@ -8,9 +8,12 @@ from camera_initial_pose import camera_initial_pose
 from F_x import F_x
 import cma
 from current_extrinsic import current_extrinsic
-global L, g, b, m, dt, noise_level, fx, fy, cx, cy, image_width, image_height, SIGMA_normal, SIGMA_STO_8EO, Q, x_hat, N, state_dim, K
+global L, g, b, m, dt, noise_level, fx, fy, cx, cy, image_width, image_height, SIGMA_normal, SIGMA_STO_8EO, Q, x_hat, N, state_dim, K, P, total_cost, sigma_world, initial_parameters, Pi_iprev,Pz
 import scienceplots
 import random
+from scipy.io import savemat
+
+
 
 plt.style.use(["default","no-latex"])
 # Constants
@@ -124,6 +127,8 @@ def get_camera_position(r, phi, theta, offset=-1):
 
 
 def objective_function(params):
+    global P,total_cost,sigma_world,initial_parameters,Pi_iprev,Pz
+
     alpha, beta, phi, theta = params
     # Parameter constraints
     if alpha <= 0 or beta <= 0 or not (0 < phi <= np.pi / 2) or not (0 <= theta <= 2 * np.pi):
@@ -131,8 +136,6 @@ def objective_function(params):
     
     try:
         # Set UKF weights
-
- 
         n = 6
         kappa = 0
         lambda_ = alpha**2 * (n + kappa) - n
@@ -215,6 +218,7 @@ def objective_function(params):
 
                 KALMAN_GAIN = Pxz @ np.linalg.inv(Pz)
 
+                sigma_world = c_extr[0:3, 0:3] @ SIGMA @ c_extr[0:3, 0:3].T
                 # Update estimate with measurement
                 x_hat = x_hat_i_iprev +0* KALMAN_GAIN @ (measurements[k, :] - zhta_tilda)#---------------!!!!!!!!!!!!!!!!---------------------#
                 estimations[k, :] = x_hat[0:3]
@@ -226,12 +230,12 @@ def objective_function(params):
         print(f"Exception in objective function: {e}")
         return np.inf
 
-experiments = np.zeros([10,4])
-initial_params = np.zeros([10,4])
+experiments = np.zeros([100,4])
+initial_params = np.zeros([100,4])
 
 # Define ranges for phi and theta (you can adjust these ranges based on your needs)
 phi_range = np.linspace(np.pi / 5, np.pi / 3, 2)   # 10 values between 0 and pi for phi
-theta_range = np.linspace(0, 2 * np.pi - (1/5)* 2 * np.pi, 5)  # 10 values between 0 and 2*pi for theta
+theta_range = np.linspace(0, 2 * np.pi - (1/5)* 2 * np.pi, 25)  # 10 values between 0 and 2*pi for theta
 
 # Create the meshgrid
 phi_grid, theta_grid = np.meshgrid(phi_range, theta_range)
@@ -240,8 +244,9 @@ phi_grid, theta_grid = np.meshgrid(phi_range, theta_range)
 phi_combinations = phi_grid.flatten()
 theta_combinations = theta_grid.flatten()
 
-
-for exper in range(1, 10):
+# Initialize main storage for all experiments outside the loop
+all_experiments_results = {}
+for exper in range(1, 50):
 # Set initial parameters and bounds
     
     initial_params[exper,:] = [0.1, 1.0, phi_combinations[exper], theta_combinations[exper]]
@@ -250,8 +255,16 @@ for exper in range(1, 10):
     bounds =[[1e-3, 1e-3, 0, 0], [1.0, 3.0, np.pi / 2, 2 * np.pi]]
 
     # Run CMA-ES
-    es = cma.CMAEvolutionStrategy(initial_parameters, sigma, {'bounds': bounds, 'maxiter': 4})
+    es = cma.CMAEvolutionStrategy(initial_parameters, sigma, {'bounds': bounds, 'maxiter': 80})
 
+    # Variables to store the optimal results for the current experiment
+    best_total_cost = np.inf
+    best_initial_parameters = None
+    best_P = None
+    best_params = None
+    best_sigma_world = None
+    best_Pi_iprev = None
+    best_Pz = None
     # Lists to store covariance metrics
 
     cma_cov_dets = [] # Confidence Level of CMA output
@@ -260,6 +273,21 @@ for exper in range(1, 10):
     while not es.stop():
         solutions = es.ask()
         fitnesses = [objective_function(x) for x in solutions]
+
+        for x in solutions:
+            total_cost = objective_function(x)  # Calculate total cost with current params
+
+            # If this solution is the best so far, update optimal variables
+            if total_cost < best_total_cost:
+                best_initial_parameters = initial_parameters
+                best_total_cost = total_cost
+                best_params = x
+                best_P = P.copy()
+                best_Pz = Pz.copy()
+                best_Pi_iprev = Pi_iprev.copy()
+                best_sigma_world=sigma_world.copy()
+
+
         es.tell(solutions, fitnesses)
         es.logger.add()
         es.disp()
@@ -271,11 +299,28 @@ for exper in range(1, 10):
         covariance_matrix = es.C  # Internal CMA-ES covariance matrix
         cma_cov_dets.append(np.linalg.det(covariance_matrix))
 
+
+    # Store the best results for this experiment
+    experiment_data = {
+        'initial_parms':best_initial_parameters,
+        'best_covariance_P': best_P,
+        'best_total_cost': best_total_cost,
+        'optimized_params': best_params,
+        'sigma_world':best_sigma_world,
+        'Pi_iprev':best_Pi_iprev,
+        'Pz':best_Pz
+    }
+
+    # Add to main results dictionary
+    all_experiments_results[f'experiment_{exper}'] = experiment_data
+
+
     optimized_params = es.result.xbest
     experiments[exper,:] = np.array(optimized_params)
     print("Optimized parameters:", optimized_params)
 
-
+# Save all experiments' best results to a .mat file
+savemat('all_experiments_best_results.mat', all_experiments_results)
 
 # Create a figure and two subplots (2 rows, 1 column)
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(7, 7))
@@ -418,6 +463,8 @@ for k in range(1, num_points):
         x_hat = x_hat_i_iprev +KALMAN_GAIN @ (measurements[k, :] - zhta_tilda)#---------------!!!!!!!!!!!!!!!!---------------------#
         final_estimations[k, :] = x_hat[0:3]
         P = Pi_iprev - KALMAN_GAIN @ Pz @ KALMAN_GAIN.T
+        
+
     
 measurements_after = measurements.copy()
 
@@ -533,6 +580,7 @@ for k in range(1, num_points):
         KALMAN_GAIN = Pxz @ np.linalg.inv(Pz)
 
         # Update estimate with measurement
+        
         x_hat = x_hat_i_iprev + KALMAN_GAIN @ (measurements[k, :] - zhta_tilda)#---------------!!!!!!!!!!!!!!!!---------------------#
         initial_estimations[k, :] = x_hat[0:3]
         P = Pi_iprev - KALMAN_GAIN @ Pz @ KALMAN_GAIN.T
@@ -656,7 +704,7 @@ X_position_of_lens = r * np.cos(Phi) + offset
 Y_position_of_lens = r * np.sin(Phi) * np.cos(Theta)
 Z_position_of_lens = r * np.sin(Phi) * np.sin(Theta)
 
-for exper in range(1, 10):
+for exper in range(1, 50):
 
     x_camera_before = r * np.cos(initial_params[exper,2]) + offset
     y_camera_before  = r * np.sin(initial_params[exper,2]) * np.cos(initial_params[exper,3])
