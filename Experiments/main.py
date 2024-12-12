@@ -43,9 +43,9 @@ gce = np.linalg.inv(gec)
 
 
 # Measurement Noise (R matrix in Bibliography)
-SIGMA_normal = np.array([[0.002*0.002, 0, 0],
-                         [0, 0.002*0.002, 0],
-                         [0, 0, 0.1*0.1]])
+#SIGMA_normal = np.array([[0.002*0.002, 0, 0],
+#                         [0, 0.002*0.002, 0],
+#                         [0, 0, 0.1*0.1]])
 increased_SIGMA = np.array([[5000, 0, 0],
                           [0, 5000, 0],
                           [0, 0, 5000]])
@@ -95,13 +95,13 @@ pivot_z = 0.53869575
 pend_pivot = np.array([ 0.885 + 0.099, 0.288,  0.86])
 
 
-#SIGMA_normal = np.array([[0.002*0.002, 0, 0],
-#                         [0, 0.002*0.002, 0],
-#                         [0, 0, 0.02*0.02]])
+SIGMA_normal = np.array([[0.002*0.002, 0, 0],
+                         [0, 0.002*0.002, 0],
+                         [0, 0, 0.02*0.02]])
                          
-#increased_SIGMA = np.array([[5000, 0, 0],
-#                          [0, 5000, 0],
-#                          [0, 0, 5000]])
+increased_SIGMA = np.array([[5000, 0, 0],
+                          [0, 5000, 0],
+                          [0, 0, 5000]])
 
 
 
